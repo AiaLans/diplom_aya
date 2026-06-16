@@ -1,0 +1,218 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  STUDENT
+  COMPANY
+  CURATOR
+  SUPERVISOR
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum ApplicationStatus {
+  PENDING_CURATOR
+  PENDING_COMPANY
+  PENDING_ADMIN
+  ACCEPTED
+  REJECTED
+}
+
+enum DiaryStatus {
+  PRESENT
+  ABSENT
+}
+
+enum SupervisorStatus {
+  PENDING
+  CONFIRMED
+  REJECTED
+}
+
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  password      String?
+  name          String?
+  role          Role      @default(STUDENT)
+  image         String?
+  createdAt     DateTime  @default(now())
+  mustChangePassword Boolean @default(false)
+  companyId          String?
+
+  student       Student?
+  accounts      Account[]
+  documents     Document[]
+  sessions      Session[]
+  memorandums  Memorandum[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  provider          String
+  providerAccountId String
+  access_token      String?
+  refresh_token     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Student {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  group       String?
+  skills      String[]
+  resumeUrl   String?
+  githubUrl   String?
+  contractNumber  Int?      // уникальный номер договора
+  practiceType    String?   // PRODUCTION или PREDIPLOMA
+
+  user         User          @relation(fields: [userId], references: [id])
+  applications Application[]
+  diaryEntries DiaryEntry[]
+  reviews      Review[]
+  resume       Resume?
+}
+
+model Company {
+  id           String   @id @default(cuid())
+  name         String
+  description  String?
+  founded      Int?
+  requirements String?
+  salary       String?
+  approved     Boolean  @default(false)
+
+  address          String?
+  phone            String?
+  email            String?
+  bin              String?
+  position         String?
+  bank             String?
+  addedByStudentId String?
+  approvedAt       DateTime?
+  approvedById     String?
+
+  internships  Internship[]
+  applications Application[]
+  reviews      Review[]
+  memorandums  Memorandum[]
+}
+
+model Internship {
+  id          String   @id @default(cuid())
+  companyId   String
+  title       String
+  description String?
+  salary      String?
+
+  company      Company       @relation(fields: [companyId], references: [id])
+  applications Application[]
+}
+
+model Application {
+  id           String            @id @default(cuid())
+  studentId    String
+  companyId    String
+  internshipId String
+  status       ApplicationStatus @default(PENDING_CURATOR)
+  createdAt    DateTime          @default(now())
+
+  student    Student    @relation(fields: [studentId], references: [id])
+  company    Company    @relation(fields: [companyId], references: [id])
+  internship Internship @relation(fields: [internshipId], references: [id])
+}
+
+model DiaryEntry {
+  id              String           @id @default(cuid())
+  studentId       String
+  date            DateTime
+  status          DiaryStatus
+  report          String?
+  absenceReason   String?
+  supervisorStatus SupervisorStatus @default(PENDING)
+  supervisorComment String?
+  createdAt       DateTime         @default(now())
+
+  student Student @relation(fields: [studentId], references: [id])
+}
+
+model Review {
+  id         String   @id @default(cuid())
+  studentId  String?
+  companyId  String?
+  text       String
+  rating     Int
+  approved   Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  student Student? @relation(fields: [studentId], references: [id])
+  company Company? @relation(fields: [companyId], references: [id])
+}
+
+model ChatHistory {
+  id        String   @id @default(cuid())
+  userId    String
+  role      String
+  content   String
+  createdAt DateTime @default(now())
+}
+
+model Document {
+  id        String   @id @default(cuid())
+  userId    String
+  name      String
+  url       String
+  signed    Boolean  @default(false)
+  docType   String?  // CONTRACT, ATTENDANCE, PRESENTATION, CHARACTERISTIC
+  status    String   @default("PENDING") // PENDING, APPROVED, REJECTED
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Resume {
+  id          String   @id @default(cuid())
+  studentId   String   @unique
+  summary     String?
+  experience  String?
+  education   String?
+  skills      String[]
+  languages   String[]
+  certificates String[]
+  achievements String[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  student     Student  @relation(fields: [studentId], references: [id])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Memorandum {
+  id        String   @id @default(cuid())
+  companyId String
+  url       String
+  createdAt DateTime @default(now())
+  uploadedById String
+
+  company      Company  @relation(fields: [companyId], references: [id])
+  uploadedBy   User     @relation(fields: [uploadedById], references: [id])
+}

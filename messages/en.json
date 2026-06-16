@@ -1,0 +1,49 @@
+{
+  "nav": {
+    "companies": "Companies",
+    "contact": "Contact",
+    "login": "Sign in",
+    "start": "Get started →"
+  },
+  "hero": {
+    "badge": "Almaty Polytechnic College",
+    "title": "Your first step",
+    "titleAccent": "into your career",
+    "desc": "Qadam helps students find internships, track progress and grow their careers with AI assistance",
+    "btnFind": "Find internship",
+    "btnCompanies": "View companies",
+    "previewLabel": "Student dashboard preview"
+  },
+  "stats": {
+    "users": "Users",
+    "companies": "Companies",
+    "employment": "Employment rate",
+    "languages": "Languages"
+  },
+  "features": {
+    "title": "Everything for a successful internship",
+    "subtitle": "One tool for students, companies and curators",
+    "ai": { "title": "AI Assistant", "desc": "Career advice, resume improvement and report writing help in three languages" },
+    "diary": { "title": "Internship diary", "desc": "Daily reports, attendance tracking and supervisor confirmation" },
+    "companies": { "title": "Top companies", "desc": "Kaspi Bank, Kolesa Group, EPAM, Yandex and other market leaders" },
+    "analytics": { "title": "Analytics", "desc": "Attendance statistics and progress for students and curators" },
+    "docs": { "title": "Documents", "desc": "Automatic generation and management of internship documents" },
+    "notifications": { "title": "Notifications", "desc": "Instant notifications about application status and activity" }
+  },
+  "roles": {
+    "title": "A role for everyone",
+    "subtitle": "The platform works for all participants",
+    "student": { "title": "Student", "desc": "Applies, keeps diary, chats with AI" },
+    "curator": { "title": "Curator", "desc": "Monitors group, reviews applications" },
+    "company": { "title": "Company", "desc": "Accepts interns, confirms diary" },
+    "admin": { "title": "Admin", "desc": "Manages the whole platform and users" }
+  },
+  "cta": {
+    "title": "Ready to start?",
+    "desc": "Register for free and find your internship today",
+    "btn": "Register for free →"
+  },
+  "footer": {
+    "copyright": "© 2026 Almaty Polytechnic College"
+  }
+}

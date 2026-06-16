@@ -1,36 +1,300 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🎓 Qadam — AI-платформа управления стажировками
 
-## Getting Started
+> **Қадам** (каз.) — шаг. Платформа помогает студентам сделать первый шаг в карьеру.
 
-First, run the development server:
+Дипломная работа: «Разработка AI-платформы управления стажировками студентов на примере Алматинского политехнического колледжа»
+
+---
+
+## 📋 О проекте
+
+**Qadam** — веб-платформа для автоматизации и цифровизации процесса прохождения производственной и преддипломной практики студентов АПК (Алматы Политехникалық Колледжі).
+
+Платформа объединяет студентов, компании, кураторов и администрацию колледжа в единую систему с поддержкой AI-ассистента.
+
+---
+
+## 🚀 Стек технологий
+
+| Уровень | Технология |
+|---------|-----------|
+| Frontend | Next.js 14 (App Router), TypeScript, Tailwind CSS |
+| Backend | Next.js API Routes |
+| База данных | PostgreSQL (Supabase) + Prisma ORM v5 |
+| Аутентификация | NextAuth.js (Email + Google + GitHub + Yandex OAuth) |
+| AI | Groq SDK (Llama 3.1) |
+| Хранилище файлов | Supabase Storage |
+| Email | Nodemailer (Gmail) |
+| Деплой | Vercel + Supabase |
+
+---
+
+## ⚙️ Установка и запуск
+
+### 1. Клонируй репозиторий
+
+```bash
+git clone https://github.com/your-username/qadam.git
+cd qadam
+```
+
+### 2. Установи зависимости
+
+```bash
+npm install
+```
+
+### 3. Создай файл `.env`
+
+```env
+# База данных
+DATABASE_URL="postgresql://..."
+DIRECT_URL="postgresql://..."
+
+# NextAuth
+NEXTAUTH_SECRET="your-secret"
+NEXTAUTH_URL="http://localhost:3000"
+
+# OAuth провайдеры
+GOOGLE_CLIENT_ID="..."
+GOOGLE_CLIENT_SECRET="..."
+GITHUB_CLIENT_ID="..."
+GITHUB_CLIENT_SECRET="..."
+YANDEX_CLIENT_ID="..."
+YANDEX_CLIENT_SECRET="..."
+
+# Email
+GMAIL_USER="your@gmail.com"
+GMAIL_PASS="your-app-password"
+
+# AI
+GROQ_API_KEY="gsk_..."
+
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL="https://xxx.supabase.co"
+SUPABASE_SERVICE_KEY="eyJ..."
+```
+
+### 4. Применить схему базы данных
+
+```bash
+npx prisma db push
+npx prisma generate
+```
+
+### 5. Заполнить базу данных
+
+```bash
+node prisma/seed.ts
+```
+
+### 6. Запустить проект
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Открой [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 👥 Роли пользователей
 
-## Learn More
+| Роль | Email | Пароль | Доступ |
+|------|-------|--------|--------|
+| **SUPER_ADMIN** | superadmin@qadam.kz | SuperAdmin2024! | Полный доступ к системе |
+| **ADMIN** | admin@qadam.kz | admin123 | Управление колледжем |
+| **CURATOR** | curator@qadam.kz | curator123 | Куратор группы |
+| **STUDENT** | test@test.com | 123456 | Студент |
+| **COMPANY** (Kaspi) | kaspi@qadam.kz | kaspibank2024! | Компания |
+| **SUPERVISOR** (Kaspi) | supervisor.kaspi@qadam.kz | sup.kaspibank2024! | Супервизор |
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📱 Основные функции
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Для студентов
+- 📝 Подача заявок на стажировку
+- 📔 Ведение цифрового дневника практики (календарный вид)
+- 📄 Управление документами (договор, меморандум)
+- 🤖 AI-ассистент (карьерные советы, помощь с резюме)
+- 📋 Создание и скачивание резюме в PDF
+- 👤 Личный профиль с фото и GitHub ссылкой
 
-## Deploy on Vercel
+### Для компаний
+- 👥 Просмотр заявок кандидатов
+- 📊 Статистика активных стажёров
+- 📋 Просмотр резюме студентов
+- 📜 Меморандум о сотрудничестве
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Для кураторов
+- 👁️ Просмотр студентов группы ИС22-4А
+- ✅ Одобрение заявок (1-й этап)
+- 📔 Мониторинг посещаемости
+- 👤 Просмотр профилей и резюме студентов
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Для супервизоров
+- ✅ Подтверждение записей дневника
+- 👥 Просмотр только своих студентов
+- 📜 Доступ к меморандуму компании
+
+### Для администрации
+- 🏢 Одобрение новых компаний
+- ✅ Финальное одобрение заявок (3-й этап)
+- 👥 Массовое создание студентов
+- 📊 Общая статистика платформы
+
+### Для Super Admin
+- 🔧 CRUD всех данных без терминала
+- 👥 Управление пользователями (смена ролей, удаление)
+- 🏢 Управление компаниями и вакансиями
+- 📋 Просмотр всех заявок, дневников, документов
+
+---
+
+## 🔄 Процесс подачи заявки
+
+```
+Студент подаёт заявку
+        ↓
+  PENDING_CURATOR
+        ↓
+  Куратор одобряет
+        ↓
+  PENDING_COMPANY
+        ↓
+  Компания одобряет
+        ↓
+  PENDING_ADMIN
+        ↓
+  Админ одобряет
+        ↓
+    ACCEPTED ✅
+```
+
+---
+
+## 📅 Периоды практики
+
+| Вид практики | Даты |
+|-------------|------|
+| Производственная практика | 10.11.2025 — 12.12.2025 |
+| Преддипломная практика | 26.03.2026 — 03.06.2026 |
+
+> Дневник доступен только в указанные периоды практики.
+
+---
+
+## 🗂️ Структура проекта
+
+```
+qadam/
+├── app/
+│   ├── page.tsx                    # Главная страница (лендинг)
+│   ├── (auth)/                     # Страницы авторизации
+│   │   ├── login/
+│   │   ├── register/
+│   │   ├── change-password/
+│   │   └── signout/
+│   ├── (dashboard)/                # Дашборды по ролям
+│   │   ├── student/                # Студент
+│   │   ├── curator/                # Куратор
+│   │   ├── company/                # Компания
+│   │   ├── supervisor/             # Супервизор
+│   │   ├── admin/                  # Админ
+│   │   └── superadmin/             # Super Admin
+│   ├── api/                        # API маршруты
+│   │   ├── auth/
+│   │   ├── profile/
+│   │   ├── diary/
+│   │   ├── applications/
+│   │   ├── documents/
+│   │   ├── memorandum/
+│   │   ├── resume/
+│   │   ├── ai/
+│   │   ├── admin/
+│   │   ├── curator/
+│   │   ├── company/
+│   │   ├── supervisor/
+│   │   └── superadmin/
+│   └── companies/                  # Публичный каталог компаний
+├── components/                     # React компоненты
+├── lib/                            # Утилиты
+│   ├── auth.ts                     # NextAuth конфигурация
+│   ├── prisma.ts                   # Prisma клиент
+│   ├── supabase.ts                 # Supabase клиент
+│   └── practice.ts                 # Периоды практики
+├── prisma/
+│   └── schema.prisma               # Схема базы данных
+└── public/                         # Статичные файлы
+    ├── Договор_-_бланк.docx
+    ├── Договор_-_пример.docx
+    ├── Меморандум_-_бланк.doc
+    └── Меморандум_-_пример.doc
+```
+
+---
+
+## 🌐 Языки интерфейса
+
+- 🇰🇿 Казахский (қазақша)
+- 🇷🇺 Русский
+- 🇬🇧 English
+
+Переключение языков доступно на главной странице через компонент `LangThemeToggle`.
+
+---
+
+## 🎨 Темы оформления
+
+- ☀️ Светлая тема
+- 🌙 Тёмная тема
+
+---
+
+## 📊 База данных — модели
+
+```
+User          — пользователи всех ролей
+Student       — профиль студента
+Company       — компании
+Internship    — вакансии
+Application   — заявки на стажировку
+DiaryEntry    — записи дневника
+Resume        — резюме студента
+Document      — документы (договоры, PDF)
+Memorandum    — меморандумы компаний
+ChatHistory   — история AI чата
+Account       — OAuth аккаунты
+```
+
+---
+
+## 🏢 Компании в системе
+
+| Компания | Специализация |
+|---------|--------------|
+| Kaspi Bank | Финтех |
+| Halyk Bank | Банкинг |
+| EPAM Systems | IT аутсорсинг |
+| Yandex | Технологии |
+| Kolesa Group | Маркетплейс |
+| Amazon | E-commerce / Cloud |
+| Jusan Bank | Цифровой банк |
+| Freedom Finance | Финтех |
+| Beeline Kazakhstan | Телеком |
+| Chocofamily | IT-продукты |
+| DAR | Госцифровизация |
+| Mareven Food Central | Производство |
+| Google | Технологии |
+| Microsoft | Программное обеспечение |
+| Сбербанк Казахстан | Банкинг |
+| Samsung R&D Kazakhstan | Электроника |
+
+---
+
+## 📝 Лицензия
+
+© 2026 Алматы политехникалық колледжі. Все права защищены.
+
+Разработано в рамках дипломной работы студенткой группы ИС22-4А.

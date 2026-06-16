@@ -128,3 +128,26 @@
     @apply font-sans;
   }
 }
+
+:root {
+  --bg: #0d0d0d;
+  --text: #ffffff;
+  --text-muted: rgba(255, 255, 255, 0.45);
+  --qadam-border: rgba(255, 255, 255, 0.08);
+  --card-bg: rgba(255, 255, 255, 0.04);
+  --nav-bg: rgba(13, 13, 13, 0.95);
+}
+
+body {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+@media print {
+  body {
+    background: white !important;
+  }
+  
+  nav, header {
+    display: none !important;
+  }
+}
