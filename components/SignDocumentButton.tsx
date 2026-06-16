@@ -14,10 +14,14 @@ export default function SignDocumentButton({
   id,
   signed,
   verificationToken,
+  signerName: defaultSignerName,
+  signerRole,
 }: {
   id: string
   signed: boolean
   verificationToken?: string | null
+  signerName?: string | null
+  signerRole: 'ADMIN' | 'SUPER_ADMIN'
 }) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
@@ -25,8 +29,7 @@ export default function SignDocumentButton({
   const [signature, setSignature] = useState('')
   const [keyId, setKeyId] = useState('')
   const [userId, setUserId] = useState('')
-  const [signerName, setSignerName] = useState('')
-  const [signerRole, setSignerRole] = useState('methodist')
+  const [signerName, setSignerName] = useState(defaultSignerName ?? '')
   const [error, setError] = useState('')
 
   async function createRequest() {
@@ -57,7 +60,6 @@ export default function SignDocumentButton({
         keyId,
         userId,
         signerName,
-        signerRole,
       }),
     })
     const data = await res.json()
@@ -67,8 +69,7 @@ export default function SignDocumentButton({
       setSignature('')
       setKeyId('')
       setUserId('')
-      setSignerName('')
-      setSignerRole('methodist')
+      setSignerName(defaultSignerName ?? '')
       router.refresh()
     } else {
       setError(data.error ?? 'Подпись не прошла проверку')
@@ -152,12 +153,9 @@ export default function SignDocumentButton({
           </div>
           <div>
             <label className="block text-[11px] text-gray-500 mb-1">Роль подписанта</label>
-            <input
-              value={signerRole}
-              onChange={e => setSignerRole(e.target.value)}
-              className="w-full border rounded-lg px-2 py-1 text-xs"
-              placeholder="methodist"
-            />
+            <div className="w-full border rounded-lg px-2 py-1 text-xs bg-gray-50 text-gray-700">
+              {signerRole}
+            </div>
           </div>
           <div className="flex justify-between gap-2">
             <a
