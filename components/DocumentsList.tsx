@@ -30,11 +30,26 @@ const STATUS_KZ: Record<string, { label: string; color: string }> = {
   REJECTED: { label: '❌ Қабылданбады', color: 'text-red-600' },
 }
 
+const SIGNATURE_RU: Record<string, { label: string; color: string }> = {
+  UNSIGNED: { label: 'ЭЦП не подписан', color: 'text-gray-500' },
+  SIGN_REQUESTED: { label: 'Ожидает ЭЦП', color: 'text-blue-600' },
+  SIGNED: { label: 'ЭЦП подтверждена', color: 'text-green-600' },
+  SIGN_FAILED: { label: 'Ошибка ЭЦП', color: 'text-red-600' },
+}
+
+const SIGNATURE_KZ: Record<string, { label: string; color: string }> = {
+  UNSIGNED: { label: 'ЭЦҚ қойылмаған', color: 'text-gray-500' },
+  SIGN_REQUESTED: { label: 'ЭЦҚ күтуде', color: 'text-blue-600' },
+  SIGNED: { label: 'ЭЦҚ расталды', color: 'text-green-600' },
+  SIGN_FAILED: { label: 'ЭЦҚ қатесі', color: 'text-red-600' },
+}
+
 const translations = {
   ru: {
     title: 'Мои документы',
     noDocuments: 'Нет загруженных документов',
     open: 'Открыть',
+    verify: 'Проверить',
     delete: 'Удалить',
     confirmDelete: 'Удалить этот документ?',
   },
@@ -42,6 +57,7 @@ const translations = {
     title: 'Менің құжаттарым',
     noDocuments: 'Жүктелген құжаттар жоқ',
     open: 'Ашу',
+    verify: 'Тексеру',
     delete: 'Жою',
     confirmDelete: 'Бұл құжатты жою керек пе?',
   }
@@ -64,6 +80,7 @@ export default function DocumentsList({ documents }: { documents: any[] }) {
   const t = translations[lang as 'ru' | 'kz'] ?? translations.ru
   const DOC_TYPES = lang === 'kz' ? DOC_TYPES_KZ : DOC_TYPES_RU
   const STATUS = lang === 'kz' ? STATUS_KZ : STATUS_RU
+  const SIGNATURE = lang === 'kz' ? SIGNATURE_KZ : SIGNATURE_RU
 
   const [deleting, setDeleting] = useState<string | null>(null)
 
@@ -84,6 +101,7 @@ export default function DocumentsList({ documents }: { documents: any[] }) {
         <div className="space-y-3">
           {documents.map((doc: any) => {
             const status = STATUS[doc.status] ?? STATUS.PENDING
+            const signature = SIGNATURE[doc.signatureStatus] ?? SIGNATURE.UNSIGNED
             return (
               <div key={doc.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
                 <div className="flex items-center gap-3">
@@ -92,9 +110,15 @@ export default function DocumentsList({ documents }: { documents: any[] }) {
                     <p className="font-medium text-sm">{DOC_TYPES[doc.docType ?? ''] ?? doc.name}</p>
                     <p className="text-xs text-gray-400">{formatDate(doc.createdAt, lang)}</p>
                     <p className={`text-xs font-medium ${status.color}`}>{status.label}</p>
+                    <p className={`text-xs font-medium ${signature.color}`}>{signature.label}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
+                  {doc.verificationToken && (
+                    <a href={`/verify/${doc.verificationToken}`} target="_blank" className="text-green-600 text-sm hover:underline">
+                      {t.verify}
+                    </a>
+                  )}
                   <a href={doc.url} target="_blank" className="text-blue-600 text-sm hover:underline">
                     {t.open}
                   </a>

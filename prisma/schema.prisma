@@ -51,6 +51,7 @@ model User {
   student       Student?
   accounts      Account[]
   documents     Document[]
+  signedDocuments Document[] @relation("DocumentSignedBy")
   sessions      Session[]
   memorandums  Memorandum[]
 }
@@ -170,16 +171,32 @@ model ChatHistory {
 }
 
 model Document {
-  id        String   @id @default(cuid())
-  userId    String
-  name      String
-  url       String
-  signed    Boolean  @default(false)
-  docType   String?  // CONTRACT, ATTENDANCE, PRESENTATION, CHARACTERISTIC
-  status    String   @default("PENDING") // PENDING, APPROVED, REJECTED
-  createdAt DateTime @default(now())
+  id                String    @id @default(cuid())
+  userId            String
+  name              String
+  url               String
+  signed            Boolean   @default(false)
+  docType           String?   // CONTRACT, ATTENDANCE, PRESENTATION, CHARACTERISTIC
+  status            String    @default("PENDING") // PENDING, APPROVED, REJECTED
+  signatureStatus   String    @default("UNSIGNED") // UNSIGNED, SIGN_REQUESTED, SIGNED, SIGN_FAILED
+  signRequestedAt   DateTime?
+  signedAt          DateTime?
+  signedById        String?
+  certThumbprint    String?
+  certSubject       String?
+  signature         String?   @db.Text
+  documentHash      String?
+  verificationToken String?   @unique
+  kriptoUserId      String?
+  kriptoKeyId       String?
+  kriptoSignatureId String?
+  kriptoVerificationUrl String?
+  kriptoQrSvg       String?   @db.Text
+  signatureError    String?
+  createdAt         DateTime  @default(now())
 
-  user      User     @relation(fields: [userId], references: [id])
+  user              User      @relation(fields: [userId], references: [id])
+  signedBy          User?     @relation("DocumentSignedBy", fields: [signedById], references: [id])
 }
 
 model Resume {

@@ -3,6 +3,7 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { redirect } from 'next/navigation'
 import ApproveDocButton from '@/components/ApproveDocButton'
+import SignDocumentButton from '@/components/SignDocumentButton'
 
 const DOC_TYPE_LABELS: Record<string, string> = {
   CONTRACT: '📄 Договор',
@@ -15,6 +16,13 @@ const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   PENDING: { label: 'На проверке', color: 'bg-yellow-100 text-yellow-700' },
   APPROVED: { label: 'Одобрен', color: 'bg-green-100 text-green-700' },
   REJECTED: { label: 'Отклонён', color: 'bg-red-100 text-red-700' },
+}
+
+const SIGNATURE_LABELS: Record<string, { label: string; color: string }> = {
+  UNSIGNED: { label: 'Без ЭЦП', color: 'bg-gray-100 text-gray-600' },
+  SIGN_REQUESTED: { label: 'Запрос ЭЦП', color: 'bg-blue-100 text-blue-700' },
+  SIGNED: { label: 'ЭЦП проверена', color: 'bg-green-100 text-green-700' },
+  SIGN_FAILED: { label: 'ЭЦП ошибка', color: 'bg-red-100 text-red-700' },
 }
 
 export default async function AdminDocumentsPage() {
@@ -90,7 +98,11 @@ export default async function AdminDocumentsPage() {
                     >
                       Открыть
                     </a>
-                    <ApproveDocButton id={doc.id} action="APPROVED" />
+                    <SignDocumentButton
+                      id={doc.id}
+                      signed={doc.signed}
+                      verificationToken={doc.verificationToken}
+                    />
                     <ApproveDocButton id={doc.id} action="REJECTED" />
                   </div>
                 </div>
@@ -108,6 +120,7 @@ export default async function AdminDocumentsPage() {
             <div className="space-y-3">
               {documents.map((doc: any) => {
                 const status = STATUS_LABELS[doc.status] ?? STATUS_LABELS.PENDING
+                const signature = SIGNATURE_LABELS[doc.signatureStatus] ?? SIGNATURE_LABELS.UNSIGNED
                 return (
                   <div key={doc.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
                     <div className="flex items-center gap-3">
@@ -123,9 +136,21 @@ export default async function AdminDocumentsPage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
+                      <span className={`text-xs px-2 py-1 rounded-full font-medium ${signature.color}`}>
+                        {signature.label}
+                      </span>
                       <span className={`text-xs px-2 py-1 rounded-full font-medium ${status.color}`}>
                         {status.label}
                       </span>
+                      {doc.verificationToken && (
+                        <a
+                          href={`/verify/${doc.verificationToken}`}
+                          target="_blank"
+                          className="text-green-700 text-sm hover:underline"
+                        >
+                          Проверка
+                        </a>
+                      )}
                       <a
                         href={doc.url}
                         target="_blank"

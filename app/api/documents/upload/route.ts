@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { supabase } from '@/lib/supabase'
+import { createVerificationToken, sha256Hex } from '@/lib/document-signing'
 
 export async function POST(req: Request) {
   try {
@@ -25,6 +26,7 @@ export async function POST(req: Request) {
 
     const bytes = await file.arrayBuffer()
     const buffer = Buffer.from(bytes)
+    const documentHash = sha256Hex(buffer)
     const fileName = `${session.user.id}/${docType}_${Date.now()}.pdf`
 
     const { error } = await supabase.storage
@@ -52,9 +54,12 @@ export async function POST(req: Request) {
         userId: session.user.id,
         name: docTypeLabels[docType] ?? file.name,
         url: urlData.publicUrl,
-        signed: true,
+        signed: false,
         docType: docType,
         status: 'PENDING',
+        signatureStatus: 'UNSIGNED',
+        documentHash,
+        verificationToken: createVerificationToken(),
       }
     })
 
