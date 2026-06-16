@@ -15,21 +15,17 @@ export default function SignDocumentButton({
   signed,
   verificationToken,
   signerName: defaultSignerName,
-  signerRole,
 }: {
   id: string
   signed: boolean
   verificationToken?: string | null
   signerName?: string | null
-  signerRole: 'ADMIN' | 'SUPER_ADMIN'
 }) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [request, setRequest] = useState<SignRequest | null>(null)
-  const [signature, setSignature] = useState('')
-  const [keyId, setKeyId] = useState('')
-  const [userId, setUserId] = useState('')
-  const [signerName, setSignerName] = useState(defaultSignerName ?? '')
+  const [kriptoFile, setKriptoFile] = useState<File | null>(null)
+  const [password, setPassword] = useState('')
   const [error, setError] = useState('')
 
   async function createRequest() {
@@ -50,26 +46,34 @@ export default function SignDocumentButton({
 
   async function confirmSignature() {
     setError('')
+
+    if (!kriptoFile) {
+      setError('Выберите .kripto файл')
+      return
+    }
+
+    if (!kriptoFile.name.toLowerCase().endsWith('.kripto')) {
+      setError('Файл должен иметь расширение .kripto')
+      return
+    }
+
     setLoading(true)
+
+    const formData = new FormData()
+    formData.append('kriptoFile', kriptoFile)
+    formData.append('password', password)
+    formData.append('signerName', defaultSignerName ?? '')
 
     const res = await fetch(`/api/documents/${id}/sign-confirm`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        signature,
-        keyId,
-        userId,
-        signerName,
-      }),
+      body: formData,
     })
     const data = await res.json()
 
     if (res.ok) {
       setRequest(null)
-      setSignature('')
-      setKeyId('')
-      setUserId('')
-      setSignerName(defaultSignerName ?? '')
+      setKriptoFile(null)
+      setPassword('')
       router.refresh()
     } else {
       setError(data.error ?? 'Подпись не прошла проверку')
@@ -107,55 +111,23 @@ export default function SignDocumentButton({
       ) : (
         <div className="w-80 bg-white border rounded-xl p-3 shadow-sm space-y-2">
           <div>
-            <label className="block text-[11px] text-gray-500 mb-1">SHA-256</label>
+            <label className="block text-[11px] text-gray-500 mb-1">Файл ключа .kripto</label>
             <input
-              value={request.document_hash}
-              readOnly
-              className="w-full border rounded-lg px-2 py-1 text-[11px] font-mono bg-gray-50"
-            />
-          </div>
-          <div>
-            <label className="block text-[11px] text-gray-500 mb-1">Подпись</label>
-            <textarea
-              value={signature}
-              onChange={e => setSignature(e.target.value)}
-              rows={3}
+              type="file"
+              accept=".kripto"
+              onChange={e => setKriptoFile(e.target.files?.[0] ?? null)}
               className="w-full border rounded-lg px-2 py-1 text-xs"
-              placeholder="128 lowercase hex Ed25519 signature"
             />
           </div>
           <div>
-            <label className="block text-[11px] text-gray-500 mb-1">key_id из Kripto</label>
+            <label className="block text-[11px] text-gray-500 mb-1">Пароль, если задан</label>
             <input
-              value={keyId}
-              onChange={e => setKeyId(e.target.value)}
+              type="password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
               className="w-full border rounded-lg px-2 py-1 text-xs"
-              placeholder="UUID публичного ключа"
+              placeholder="Можно оставить пустым"
             />
-          </div>
-          <div>
-            <label className="block text-[11px] text-gray-500 mb-1">user_id из Kripto</label>
-            <input
-              value={userId}
-              onChange={e => setUserId(e.target.value)}
-              className="w-full border rounded-lg px-2 py-1 text-xs"
-              placeholder="UUID пользователя"
-            />
-          </div>
-          <div>
-            <label className="block text-[11px] text-gray-500 mb-1">Имя подписанта</label>
-            <input
-              value={signerName}
-              onChange={e => setSignerName(e.target.value)}
-              className="w-full border rounded-lg px-2 py-1 text-xs"
-              placeholder="ФИО для публичной проверки"
-            />
-          </div>
-          <div>
-            <label className="block text-[11px] text-gray-500 mb-1">Роль подписанта</label>
-            <div className="w-full border rounded-lg px-2 py-1 text-xs bg-gray-50 text-gray-700">
-              {signerRole}
-            </div>
           </div>
           <div className="flex justify-between gap-2">
             <a

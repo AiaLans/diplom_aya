@@ -103,7 +103,6 @@ export default async function AdminDocumentsPage() {
                       signed={doc.signed}
                       verificationToken={doc.verificationToken}
                       signerName={session.user.name}
-                      signerRole={session.user.role as 'ADMIN' | 'SUPER_ADMIN'}
                     />
                     <ApproveDocButton id={doc.id} action="REJECTED" />
                   </div>
