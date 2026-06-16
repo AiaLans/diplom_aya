@@ -47,6 +47,13 @@ function decodeMaybeHexOrBase64(value: string) {
   return Buffer.from(value, 'base64')
 }
 
+function normalizeEd25519PrivateKey(bytes: Buffer) {
+  if (bytes.length === 32) return bytes
+  if (bytes.length === 64) return bytes.subarray(0, 32)
+
+  throw new Error('Приватный ключ Ed25519 в .kripto должен быть 32 или 64 байта')
+}
+
 function privateKeyFromDecryptedBytes(decrypted: Buffer) {
   const asText = decrypted.toString('utf8').trim()
   if (/^[a-f0-9]{64}$/i.test(asText) || /^[A-Za-z0-9+/=]{40,}$/.test(asText)) {
@@ -167,6 +174,7 @@ export async function signHashWithKriptoContainer({
   const container = readJsonContainer(Buffer.from(await file.arrayBuffer()))
   const keyId = getString(container, ['key_id', 'keyId', 'public_key_id', 'publicKeyId'])
   const userId = getString(container, ['user_id', 'userId', 'owner_id', 'ownerId'])
+  const publicKey = normalizeHex(getString(container, ['public_key', 'publicKey', 'public_key_hex', 'publicKeyHex']))
 
   if (!keyId || !userId) {
     throw new Error('.kripto файл должен содержать key_id и user_id')
@@ -183,12 +191,20 @@ export async function signHashWithKriptoContainer({
   }
 
   const documentHashBytes = hexToBytes(documentHash)
-  const privateKeyBytes = decodeMaybeHexOrBase64(privateKey)
+  const privateKeyBytes = normalizeEd25519PrivateKey(decodeMaybeHexOrBase64(privateKey))
   const signature = await ed25519.signAsync(documentHashBytes, privateKeyBytes)
+  const signatureHex = bytesToHex(signature)
+
+  if (publicKey) {
+    const isValid = await ed25519.verifyAsync(signature, documentHashBytes, hexToBytes(publicKey))
+    if (!isValid) {
+      throw new Error('Подпись не совпадает с публичным ключом из .kripto файла')
+    }
+  }
 
   return {
     keyId,
     userId,
-    signature: bytesToHex(signature),
+    signature: signatureHex,
   }
 }

@@ -37,6 +37,16 @@ type KriptoRegisterResponse = {
   qr_svg?: string
 }
 
+function compactDetails(details: unknown) {
+  if (!details || typeof details !== 'object') return ''
+
+  try {
+    return ` ${JSON.stringify(details)}`
+  } catch {
+    return ''
+  }
+}
+
 export function sha256Hex(buffer: Buffer) {
   return createHash('sha256').update(buffer).digest('hex')
 }
@@ -85,7 +95,9 @@ function kriptoHeaders(correlationId: string) {
 
 function normalizeKriptoError(status: number, body: KriptoErrorResponse | string) {
   if (typeof body === 'string') return `Kripto API вернул ${status}: ${body}`
-  return body.error?.message ?? body.error?.code ?? `Kripto API вернул ${status}`
+  const code = body.error?.code ? `[${body.error.code}] ` : ''
+  const message = body.error?.message ?? `Kripto API вернул ${status}`
+  return `${code}${message}${compactDetails(body.error?.details)}`
 }
 
 async function readKriptoBody(res: Response) {

@@ -58,7 +58,7 @@ export async function POST(
       keyId: containerSignature.keyId,
       userId: containerSignature.userId,
       documentId: document.id,
-      documentVersion: documentVersion || document.docType || 'v1',
+      documentVersion: documentVersion || 'v1',
       signerName: signerName || session.user.name || session.user.email || undefined,
       signerRole: session.user.role,
     })
@@ -76,7 +76,11 @@ export async function POST(
       })
 
       return NextResponse.json(
-        { error: verification.error ?? 'Подпись не прошла проверку' },
+        {
+          error: verification.error ?? 'Подпись не прошла проверку',
+          correlation_id: verification.correlationId,
+          provider: verification.provider,
+        },
         { status: 400 }
       )
     }
