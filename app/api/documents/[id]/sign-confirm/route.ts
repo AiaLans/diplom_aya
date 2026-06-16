@@ -8,6 +8,7 @@ import {
   verifyDetachedSignature,
 } from '@/lib/document-signing'
 import { addKriptoQrToPdf } from '@/lib/pdf-qr-stamp'
+import { signHashWithKriptoContainer } from '@/lib/kripto-container'
 
 export async function POST(
   req: Request,
@@ -20,13 +21,15 @@ export async function POST(
     }
 
     const { id } = await params
-    const {
-      signature,
-      keyId,
-      userId,
-      signerName,
-      documentVersion,
-    } = await req.json()
+    const formData = await req.formData()
+    const kriptoFile = formData.get('kriptoFile')
+    const password = String(formData.get('password') ?? '')
+    const signerName = String(formData.get('signerName') ?? '')
+    const documentVersion = String(formData.get('documentVersion') ?? '')
+
+    if (!(kriptoFile instanceof File)) {
+      return NextResponse.json({ error: 'Выберите .kripto файл' }, { status: 400 })
+    }
 
     const document = await prisma.document.findUnique({
       where: { id },
@@ -42,16 +45,21 @@ export async function POST(
 
     const buffer = await fetchDocumentBuffer(document.url)
     const currentHash = sha256Hex(buffer)
+    const containerSignature = await signHashWithKriptoContainer({
+      file: kriptoFile,
+      password,
+      documentHash: currentHash,
+    })
 
     const verification = await verifyDetachedSignature({
       documentHash: currentHash,
       expectedDocumentHash: document.documentHash,
-      signature: String(signature ?? ''),
-      keyId: String(keyId ?? ''),
-      userId: String(userId ?? ''),
+      signature: containerSignature.signature,
+      keyId: containerSignature.keyId,
+      userId: containerSignature.userId,
       documentId: document.id,
-      documentVersion: documentVersion ? String(documentVersion) : document.docType ?? 'v1',
-      signerName: signerName ? String(signerName) : session.user.name ?? session.user.email ?? undefined,
+      documentVersion: documentVersion || document.docType || 'v1',
+      signerName: signerName || session.user.name || session.user.email || undefined,
       signerRole: session.user.role,
     })
 
@@ -99,9 +107,9 @@ export async function POST(
         signed: true,
         signedAt,
         signedById: session.user.id,
-        certThumbprint: String(keyId),
-        certSubject: signerName ? String(signerName) : session.user.name ?? null,
-        signature: String(signature),
+        certThumbprint: containerSignature.keyId,
+        certSubject: signerName || session.user.name || null,
+        signature: containerSignature.signature,
         documentHash: currentHash,
         signatureStatus: 'SIGNED',
         signatureError: stampError,
@@ -112,8 +120,8 @@ export async function POST(
     await prisma.$executeRaw`
       UPDATE "Document"
       SET
-        "kriptoUserId" = ${String(userId)},
-        "kriptoKeyId" = ${String(keyId)},
+        "kriptoUserId" = ${containerSignature.userId},
+        "kriptoKeyId" = ${containerSignature.keyId},
         "kriptoSignatureId" = ${verification.signatureId ?? null},
         "kriptoVerificationUrl" = ${kriptoVerificationUrl ?? null},
         "kriptoQrSvg" = ${verification.qrSvg ?? null}
