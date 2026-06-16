@@ -31,21 +31,8 @@ const translations = {
     active: '● Активна',
     completed: 'Завершена',
     upcoming: 'Предстоит',
-    templates: 'Шаблоны документов',
-    templatesDesc: 'Скачайте шаблон, заполните, распечатайте и загрузите подписанный PDF',
-    contract: 'Договор о практике (бланк)',
-    contractDesc: 'Пустой бланк для заполнения',
-    example: 'Пример',
-    download: 'Скачать',
-    characteristic: 'Характеристика',
-    characteristicDesc: 'Заполняется студентом, подписывается руководителем',
-    presentation: 'Шаблон презентации',
-    presentationDesc: 'PowerPoint шаблон для отчёта',
-    instruction: 'Инструкция',
-    attendance: 'Лист учёта посещаемости',
-    attendanceDesc: 'Фиксирует время прихода и ухода',
-    uploadTitle: 'Загрузить подписанный договор',
-    uploadDesc: 'После подписания загрузите договор в формате PDF',
+    uploadTitle: 'Загрузить документ',
+    uploadDesc: 'Загрузите PDF, после проверки администратор подпишет его через Kripto',
   },
   kz: {
     title: 'Құжаттар',
@@ -60,21 +47,8 @@ const translations = {
     active: '● Белсенді',
     completed: 'Аяқталды',
     upcoming: 'Алдағы',
-    templates: 'Құжат үлгілері',
-    templatesDesc: 'Үлгіні жүктеп алыңыз, толтырыңыз, басып шығарыңыз және қол қойылған PDF жүктеңіз',
-    contract: 'Тәжірибе шарты (бланк)',
-    contractDesc: 'Толтыруға арналған бос бланк',
-    example: 'Үлгі',
-    download: 'Жүктеу',
-    characteristic: 'Мінездеме',
-    characteristicDesc: 'Студент толтырады, басшы қол қояды',
-    presentation: 'Презентация үлгісі',
-    presentationDesc: 'Есеп үшін PowerPoint үлгісі',
-    instruction: 'Нұсқаулық',
-    attendance: 'Қатысу есебі парағы',
-    attendanceDesc: 'Келу және кету уақытын тіркейді',
-    uploadTitle: 'Қол қойылған шартты жүктеу',
-    uploadDesc: 'Қол қойғаннан кейін шартты PDF форматында жүктеңіз',
+    uploadTitle: 'Құжатты жүктеу',
+    uploadDesc: 'PDF жүктеңіз, тексеруден кейін әкімші оны Kripto арқылы қол қояды',
   }
 }
 
@@ -161,87 +135,7 @@ export default function DocumentsClient({ student, documents }: { student: any, 
           </div>
         </div>
 
-        {/* Шаблоны документов */}
-        <div className="bg-white rounded-2xl border p-6 mb-6">
-          <h2 className="text-lg font-semibold mb-2">{t.templates}</h2>
-          <p className="text-gray-500 text-sm mb-4">{t.templatesDesc}</p>
-          <div className="space-y-3">
-
-            {/* Договор */}
-            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center text-lg">📄</div>
-                <div>
-                  <p className="font-medium text-sm">{t.contract}</p>
-                  <p className="text-xs text-gray-500">{t.contractDesc}</p>
-                </div>
-              </div>
-              <div className="flex gap-2">
-                <a href="/Договор_-_пример.docx" download className="text-xs text-gray-500 hover:underline px-3 py-1">
-                  {t.example}
-                </a>
-                <a href="/Договор_-_бланк.docx" download className="bg-blue-600 text-white px-4 py-2 rounded-lg text-xs font-medium hover:bg-blue-700">
-                  {t.download}
-                </a>
-              </div>
-            </div>
-
-            {/* Характеристика */}
-            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center text-lg">📋</div>
-                <div>
-                  <p className="font-medium text-sm">{t.characteristic}</p>
-                  <p className="text-xs text-gray-500">{t.characteristicDesc}</p>
-                </div>
-              </div>
-              <a href="/Характеристика_шаблон.docx" download className="bg-green-600 text-white px-4 py-2 rounded-lg text-xs font-medium hover:bg-green-700">
-                {t.download}
-              </a>
-            </div>
-
-            {/* Презентация */}
-            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center text-lg">📊</div>
-                <div>
-                  <p className="font-medium text-sm">{t.presentation}</p>
-                  <p className="text-xs text-gray-500">{t.presentationDesc}</p>
-                </div>
-              </div>
-              <div className="flex gap-2">
-                <a href="/Содержание_отчета_слайда.docx" download className="text-xs text-gray-500 hover:underline px-3 py-1">
-                  {t.instruction}
-                </a>
-                <a href="/Слайд_шаблон.pptx" download className="bg-orange-600 text-white px-4 py-2 rounded-lg text-xs font-medium hover:bg-orange-700">
-                  {t.download}
-                </a>
-              </div>
-            </div>
-
-            {/* Лист посещаемости */}
-            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center text-lg">📅</div>
-                <div>
-                  <p className="font-medium text-sm">{t.attendance}</p>
-                  <p className="text-xs text-gray-500">{t.attendanceDesc}</p>
-                </div>
-              </div>
-              <div className="flex gap-2">
-                <a href="/Лист_посещаемости_пример.docx" download className="text-xs text-gray-500 hover:underline px-3 py-1">
-                  {t.example}
-                </a>
-                <a href="/Лист_посещаемости_бланк.docx" download className="bg-purple-600 text-white px-4 py-2 rounded-lg text-xs font-medium hover:bg-purple-700">
-                  {t.download}
-                </a>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-        {/* Загрузить подписанный */}
+        {/* Загрузить документ */}
         <div className="bg-white rounded-2xl border p-6 mb-6">
           <h2 className="text-lg font-semibold mb-2">{t.uploadTitle}</h2>
           <p className="text-gray-500 text-sm mb-4">{t.uploadDesc}</p>

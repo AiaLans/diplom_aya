@@ -7,6 +7,7 @@ import {
   sha256Hex,
   verifyDetachedSignature,
 } from '@/lib/document-signing'
+import { addKriptoQrToPdf } from '@/lib/pdf-qr-stamp'
 
 export async function POST(
   req: Request,
@@ -24,7 +25,6 @@ export async function POST(
       keyId,
       userId,
       signerName,
-      signerRole,
       documentVersion,
     } = await req.json()
 
@@ -52,7 +52,7 @@ export async function POST(
       documentId: document.id,
       documentVersion: documentVersion ? String(documentVersion) : document.docType ?? 'v1',
       signerName: signerName ? String(signerName) : session.user.name ?? session.user.email ?? undefined,
-      signerRole: signerRole ? String(signerRole) : session.user.role ?? undefined,
+      signerRole: session.user.role,
     })
 
     if (!verification.ok) {
@@ -74,9 +74,28 @@ export async function POST(
     }
 
     const signedAt = new Date()
+    const kriptoVerificationUrl = verification.signatureId
+      ? `https://kripto.aspc.kz/verify-signature/${verification.signatureId}`
+      : verification.verificationUrl
+    let stampedPdfUrl: string | null = null
+    let stampError: string | null = null
+
+    if (kriptoVerificationUrl) {
+      try {
+        stampedPdfUrl = await addKriptoQrToPdf({
+          sourceUrl: document.url,
+          documentId: document.id,
+          verificationUrl: kriptoVerificationUrl,
+        })
+      } catch (error) {
+        stampError = error instanceof Error ? error.message : 'Не удалось добавить QR в PDF'
+      }
+    }
+
     await prisma.document.update({
       where: { id },
       data: {
+        url: stampedPdfUrl ?? document.url,
         signed: true,
         signedAt,
         signedById: session.user.id,
@@ -85,7 +104,7 @@ export async function POST(
         signature: String(signature),
         documentHash: currentHash,
         signatureStatus: 'SIGNED',
-        signatureError: null,
+        signatureError: stampError,
         status: 'APPROVED',
       },
     })
@@ -96,7 +115,7 @@ export async function POST(
         "kriptoUserId" = ${String(userId)},
         "kriptoKeyId" = ${String(keyId)},
         "kriptoSignatureId" = ${verification.signatureId ?? null},
-        "kriptoVerificationUrl" = ${verification.verificationUrl ?? null},
+        "kriptoVerificationUrl" = ${kriptoVerificationUrl ?? null},
         "kriptoQrSvg" = ${verification.qrSvg ?? null}
       WHERE "id" = ${id}
     `
@@ -106,8 +125,10 @@ export async function POST(
       signed_at: signedAt.toISOString(),
       document_hash: currentHash,
       verification_provider: verification.provider,
-      verification_url: verification.verificationUrl,
+      verification_url: kriptoVerificationUrl,
       signature_id: verification.signatureId,
+      stamped_pdf_url: stampedPdfUrl,
+      stamp_error: stampError,
       correlation_id: verification.correlationId,
     })
   } catch (error) {
