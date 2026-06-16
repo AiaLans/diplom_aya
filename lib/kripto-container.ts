@@ -47,7 +47,52 @@ function decodeMaybeHexOrBase64(value: string) {
   return Buffer.from(value, 'base64')
 }
 
+function privateKeyFromDecryptedBytes(decrypted: Buffer) {
+  const asText = decrypted.toString('utf8').trim()
+  if (/^[a-f0-9]{64}$/i.test(asText) || /^[A-Za-z0-9+/=]{40,}$/.test(asText)) {
+    return asText
+  }
+
+  if (decrypted.length === 32 || decrypted.length === 64) {
+    return decrypted.toString('hex')
+  }
+
+  return asText
+}
+
 function decryptPrivateKey(container: KriptoContainer, password: string) {
+  const encryptedObject = container.encryptedPrivateKey
+  if (encryptedObject && typeof encryptedObject === 'object' && !Array.isArray(encryptedObject)) {
+    const encryptedContainer = encryptedObject as KriptoContainer
+    const value = getString(encryptedContainer, ['value', 'ciphertext', 'encrypted'])
+
+    if (!password) {
+      throw new Error('Для этого .kripto файла нужен пароль')
+    }
+
+    const salt = decodeMaybeHexOrBase64(getString(encryptedContainer, ['salt']))
+    const iv = decodeMaybeHexOrBase64(getString(encryptedContainer, ['nonce', 'iv']))
+    const encryptedBytes = decodeMaybeHexOrBase64(value)
+    const iterations = Number(encryptedContainer.iterations ?? 100000)
+
+    if (!salt.length || !iv.length || encryptedBytes.length <= 16) {
+      throw new Error('Некорректный encryptedPrivateKey в .kripto файле')
+    }
+
+    const ciphertext = encryptedBytes.subarray(0, encryptedBytes.length - 16)
+    const authTag = encryptedBytes.subarray(encryptedBytes.length - 16)
+    const key = pbkdf2Sync(password, salt, iterations, 32, 'sha256')
+    const decipher = createDecipheriv('aes-256-gcm', key, iv)
+    decipher.setAuthTag(authTag)
+
+    const decrypted = Buffer.concat([
+      decipher.update(ciphertext),
+      decipher.final(),
+    ])
+
+    return privateKeyFromDecryptedBytes(decrypted)
+  }
+
   const encrypted = getString(container, ['encrypted_private_key', 'encryptedPrivateKey', 'ciphertext', 'encrypted'])
   if (!encrypted) return ''
 
@@ -73,7 +118,7 @@ function decryptPrivateKey(container: KriptoContainer, password: string) {
     decipher.final(),
   ])
 
-  return decrypted.toString('utf8').trim()
+  return privateKeyFromDecryptedBytes(decrypted)
 }
 
 function getPrivateKey(container: KriptoContainer, password: string) {
@@ -87,7 +132,23 @@ function getPrivateKey(container: KriptoContainer, password: string) {
     'privateKeyHex',
   ])
 
-  return plain || decryptPrivateKey(container, password)
+  const decrypted = plain || decryptPrivateKey(container, password)
+  if (!decrypted.trim().startsWith('{')) return decrypted
+
+  try {
+    const nested = JSON.parse(decrypted) as KriptoContainer
+    return getString(nested, [
+      'private_key',
+      'privateKey',
+      'secret_key',
+      'secretKey',
+      'seed',
+      'private_key_hex',
+      'privateKeyHex',
+    ])
+  } catch {
+    return decrypted
+  }
 }
 
 export async function signHashWithKriptoContainer({
