@@ -46,20 +46,31 @@ export default async function SuperAdminDocumentsPage() {
                         ? 'bg-green-900 text-green-400'
                         : 'bg-gray-700 text-gray-400'
                     }`}>
-                      {doc.signed ? 'Подписан' : 'Не подписан'}
+                      {doc.signatureStatus === 'SIGNED' ? 'ЭЦП проверена' : doc.signatureStatus === 'SIGN_FAILED' ? 'Ошибка ЭЦП' : 'Не подписан'}
                     </span>
                   </td>
                   <td className="p-4 text-gray-500 text-xs">
                     {new Date(doc.createdAt).toLocaleDateString('ru-RU')}
                   </td>
                   <td className="p-4">
-                    <a
-                      href={doc.url}
-                      target="_blank"
-                      className="text-blue-400 text-xs hover:text-blue-300 hover:underline"
-                    >
-                      Открыть
-                    </a>
+                    <div className="flex gap-3">
+                      {doc.verificationToken && (
+                        <a
+                          href={`/verify/${doc.verificationToken}`}
+                          target="_blank"
+                          className="text-green-400 text-xs hover:text-green-300 hover:underline"
+                        >
+                          Проверка
+                        </a>
+                      )}
+                      <a
+                        href={doc.url}
+                        target="_blank"
+                        className="text-blue-400 text-xs hover:text-blue-300 hover:underline"
+                      >
+                        Открыть
+                      </a>
+                    </div>
                   </td>
                 </tr>
               ))}
