@@ -1,7 +1,10 @@
 import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
+import { connection } from 'next/server'
 
 export default async function CompanyRatingPage() {
+  await connection()
+
   const companies = await prisma.company.findMany({
     where: { approved: true },
     include: {
