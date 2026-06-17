@@ -1,10 +1,7 @@
 import type { Metadata } from 'next'
-import { Geist } from 'next/font/google'
 import './globals.css'
 import { SessionProvider } from '@/components/SessionProvider'
 import ThemeInit from '@/components/ThemeInit'
-
-const geist = Geist({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'Qadam — Платформа стажировок',
@@ -18,7 +15,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ru">
-      <body className={geist.className}>
+      <body>
         <SessionProvider>
           <ThemeInit />
           {children}
