@@ -1,8 +1,11 @@
 import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
+import { connection } from 'next/server'
 import LangThemeToggle from '@/components/LangThemeToggle'
 
 export default async function CompaniesPage() {
+  await connection()
+
   const companies = await prisma.company.findMany({
     where: { approved: true },
     include: { internships: true }

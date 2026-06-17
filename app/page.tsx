@@ -1,9 +1,12 @@
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
+import { connection } from 'next/server'
 import LangThemeToggle from '@/components/LangThemeToggle'
 import CounterStats from '@/components/CounterStats'
 
 export default async function LandingPage() {
+  await connection()
+
   const companiesCount = await prisma.company.count({ where: { approved: true } })
   const usersCount = await prisma.user.count()
 
