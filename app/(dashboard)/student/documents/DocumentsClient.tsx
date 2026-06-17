@@ -8,6 +8,57 @@ import { useLang } from '@/lib/useLang'
 
 const MONTHS_KZ_LOWER = ['қаңтар', 'ақпан', 'наурыз', 'сәуір', 'мамыр', 'маусым', 'шілде', 'тамыз', 'қыркүйек', 'қазан', 'қараша', 'желтоқсан']
 
+const TEMPLATE_FILES = [
+  {
+    href: '/Договор_-_бланк.docx',
+    icon: '📄',
+    iconClass: 'bg-blue-100',
+    title: { ru: 'Договор (бланк)', kz: 'Шарт (бланк)' },
+    desc: { ru: 'Пустой бланк для заполнения', kz: 'Толтыруға арналған бос бланк' },
+    buttonClass: 'bg-blue-600 hover:bg-blue-700',
+  },
+  {
+    href: '/Договор_-_пример.docx',
+    icon: '📋',
+    iconClass: 'bg-green-100',
+    title: { ru: 'Договор (пример)', kz: 'Шарт (үлгі)' },
+    desc: { ru: 'Образец правильного заполнения', kz: 'Дұрыс толтыру үлгісі' },
+    buttonClass: 'bg-green-600 hover:bg-green-700',
+  },
+  {
+    href: '/Лист_посещаемости_бланк.docx',
+    icon: '📅',
+    iconClass: 'bg-purple-100',
+    title: { ru: 'Лист посещаемости (бланк)', kz: 'Қатысу парағы (бланк)' },
+    desc: { ru: 'Бланк для учета посещаемости', kz: 'Қатысуды есепке алу бланкі' },
+    buttonClass: 'bg-purple-600 hover:bg-purple-700',
+  },
+  {
+    href: '/Лист_посещаемости_пример.docx',
+    icon: '✅',
+    iconClass: 'bg-emerald-100',
+    title: { ru: 'Лист посещаемости (пример)', kz: 'Қатысу парағы (үлгі)' },
+    desc: { ru: 'Пример заполненного листа посещаемости', kz: 'Толтырылған қатысу парағының үлгісі' },
+    buttonClass: 'bg-emerald-600 hover:bg-emerald-700',
+  },
+  {
+    href: '/Содержание_отчета_слайда.docx',
+    icon: '📊',
+    iconClass: 'bg-orange-100',
+    title: { ru: 'Содержание отчета слайда', kz: 'Слайд есебінің мазмұны' },
+    desc: { ru: 'Структура содержания для отчета', kz: 'Есеп мазмұнының құрылымы' },
+    buttonClass: 'bg-orange-600 hover:bg-orange-700',
+  },
+  {
+    href: '/Характеристика_шаблон.docx',
+    icon: '📝',
+    iconClass: 'bg-sky-100',
+    title: { ru: 'Характеристика (шаблон)', kz: 'Мінездеме (үлгі)' },
+    desc: { ru: 'Шаблон характеристики студента', kz: 'Студент мінездемесінің үлгісі' },
+    buttonClass: 'bg-sky-600 hover:bg-sky-700',
+  },
+]
+
 function formatDate(dateStr: string, lang: string) {
   const date = new Date(dateStr + 'T00:00:00')
   const day = date.getDate()
@@ -31,12 +82,8 @@ const translations = {
     active: '● Активна',
     completed: 'Завершена',
     upcoming: 'Предстоит',
-    templatesTitle: 'Шаблоны договоров',
-    templatesDesc: 'Скачайте шаблон, заполните вручную, распечатайте и подпишите',
-    contractBlank: 'Шаблон договора (бланк)',
-    contractBlankDesc: 'Пустой бланк для заполнения',
-    contractExample: 'Пример заполнения',
-    contractExampleDesc: 'Образец правильного заполнения',
+    templatesTitle: 'Шаблоны документов',
+    templatesDesc: 'Скачайте нужный файл, заполните вручную, распечатайте и подпишите',
     download: 'Скачать',
     uploadTitle: 'Загрузить документ',
     uploadDesc: 'Загрузите PDF, после проверки администратор подпишет его через Kripto',
@@ -54,12 +101,8 @@ const translations = {
     active: '● Белсенді',
     completed: 'Аяқталды',
     upcoming: 'Алдағы',
-    templatesTitle: 'Шарт үлгілері',
-    templatesDesc: 'Үлгіні жүктеп алып, қолмен толтырыңыз, басып шығарып, қол қойыңыз',
-    contractBlank: 'Шарт үлгісі (бланк)',
-    contractBlankDesc: 'Толтыруға арналған бос бланк',
-    contractExample: 'Толтыру үлгісі',
-    contractExampleDesc: 'Дұрыс толтыру үлгісі',
+    templatesTitle: 'Құжат үлгілері',
+    templatesDesc: 'Қажетті файлды жүктеп алып, қолмен толтырыңыз, басып шығарып, қол қойыңыз',
     download: 'Жүктеу',
     uploadTitle: 'Құжатты жүктеу',
     uploadDesc: 'PDF жүктеңіз, тексеруден кейін әкімші оны Kripto арқылы қол қояды',
@@ -149,44 +192,31 @@ export default function DocumentsClient({ student, documents }: { student: any, 
           </div>
         </div>
 
-        {/* Шаблоны договоров */}
+        {/* Шаблоны документов */}
         <div className="bg-white rounded-2xl border p-6 mb-6">
           <h2 className="text-lg font-semibold mb-2">{t.templatesTitle}</h2>
           <p className="text-gray-500 text-sm mb-4">{t.templatesDesc}</p>
           <div className="space-y-3">
-            <div className="flex items-center justify-between gap-4 p-4 bg-gray-50 rounded-xl border">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center text-lg shrink-0">📄</div>
-                <div className="min-w-0">
-                  <p className="font-medium text-sm">{t.contractBlank}</p>
-                  <p className="text-xs text-gray-500">{t.contractBlankDesc}</p>
+            {TEMPLATE_FILES.map(file => (
+              <div key={file.href} className="flex items-center justify-between gap-4 p-4 bg-gray-50 rounded-xl border">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className={`w-10 h-10 ${file.iconClass} rounded-lg flex items-center justify-center text-lg shrink-0`}>
+                    {file.icon}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-medium text-sm">{file.title[lang as 'ru' | 'kz'] ?? file.title.ru}</p>
+                    <p className="text-xs text-gray-500">{file.desc[lang as 'ru' | 'kz'] ?? file.desc.ru}</p>
+                  </div>
                 </div>
+                <a
+                  href={file.href}
+                  download
+                  className={`${file.buttonClass} text-white px-4 py-2 rounded-lg text-sm font-medium shrink-0`}
+                >
+                  {t.download}
+                </a>
               </div>
-              <a
-                href="/Договор_-_бланк.docx"
-                download
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 shrink-0"
-              >
-                {t.download}
-              </a>
-            </div>
-
-            <div className="flex items-center justify-between gap-4 p-4 bg-gray-50 rounded-xl border">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center text-lg shrink-0">📋</div>
-                <div className="min-w-0">
-                  <p className="font-medium text-sm">{t.contractExample}</p>
-                  <p className="text-xs text-gray-500">{t.contractExampleDesc}</p>
-                </div>
-              </div>
-              <a
-                href="/Договор_-_пример.docx"
-                download
-                className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 shrink-0"
-              >
-                {t.download}
-              </a>
-            </div>
+            ))}
           </div>
         </div>
 
