@@ -31,6 +31,13 @@ const translations = {
     active: '● Активна',
     completed: 'Завершена',
     upcoming: 'Предстоит',
+    templatesTitle: 'Шаблоны договоров',
+    templatesDesc: 'Скачайте шаблон, заполните вручную, распечатайте и подпишите',
+    contractBlank: 'Шаблон договора (бланк)',
+    contractBlankDesc: 'Пустой бланк для заполнения',
+    contractExample: 'Пример заполнения',
+    contractExampleDesc: 'Образец правильного заполнения',
+    download: 'Скачать',
     uploadTitle: 'Загрузить документ',
     uploadDesc: 'Загрузите PDF, после проверки администратор подпишет его через Kripto',
   },
@@ -47,6 +54,13 @@ const translations = {
     active: '● Белсенді',
     completed: 'Аяқталды',
     upcoming: 'Алдағы',
+    templatesTitle: 'Шарт үлгілері',
+    templatesDesc: 'Үлгіні жүктеп алып, қолмен толтырыңыз, басып шығарып, қол қойыңыз',
+    contractBlank: 'Шарт үлгісі (бланк)',
+    contractBlankDesc: 'Толтыруға арналған бос бланк',
+    contractExample: 'Толтыру үлгісі',
+    contractExampleDesc: 'Дұрыс толтыру үлгісі',
+    download: 'Жүктеу',
     uploadTitle: 'Құжатты жүктеу',
     uploadDesc: 'PDF жүктеңіз, тексеруден кейін әкімші оны Kripto арқылы қол қояды',
   }
@@ -132,6 +146,47 @@ export default function DocumentsClient({ student, documents }: { student: any, 
                 </div>
               )
             })}
+          </div>
+        </div>
+
+        {/* Шаблоны договоров */}
+        <div className="bg-white rounded-2xl border p-6 mb-6">
+          <h2 className="text-lg font-semibold mb-2">{t.templatesTitle}</h2>
+          <p className="text-gray-500 text-sm mb-4">{t.templatesDesc}</p>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between gap-4 p-4 bg-gray-50 rounded-xl border">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center text-lg shrink-0">📄</div>
+                <div className="min-w-0">
+                  <p className="font-medium text-sm">{t.contractBlank}</p>
+                  <p className="text-xs text-gray-500">{t.contractBlankDesc}</p>
+                </div>
+              </div>
+              <a
+                href="/Договор_-_бланк.docx"
+                download
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 shrink-0"
+              >
+                {t.download}
+              </a>
+            </div>
+
+            <div className="flex items-center justify-between gap-4 p-4 bg-gray-50 rounded-xl border">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center text-lg shrink-0">📋</div>
+                <div className="min-w-0">
+                  <p className="font-medium text-sm">{t.contractExample}</p>
+                  <p className="text-xs text-gray-500">{t.contractExampleDesc}</p>
+                </div>
+              </div>
+              <a
+                href="/Договор_-_пример.docx"
+                download
+                className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 shrink-0"
+              >
+                {t.download}
+              </a>
+            </div>
           </div>
         </div>
 
